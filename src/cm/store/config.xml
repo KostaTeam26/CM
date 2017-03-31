@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<properties resource="cm/store/datasource.properties" />		<!-- properties파일을 읽어와 -->
+
+	<typeAliases>
+		<typeAlias type="cm.domain.Building" alias="Building"></typeAlias>
+		<typeAlias type="cm.domain.ClassTime" alias="ClassTime"></typeAlias>
+		<typeAlias type="cm.domain.Comment" alias="Comment"></typeAlias>
+		<typeAlias type="cm.domain.Lecture" alias="Lecture"></typeAlias>
+		<typeAlias type="cm.domain.Professor" alias="Professor"></typeAlias>
+		<typeAlias type="cm.domain.Requirement" alias="Requirement"></typeAlias>
+		<typeAlias type="cm.domain.Timetable" alias="Timetable"></typeAlias>
+		<typeAlias type="cm.domain.User" alias="User"></typeAlias>
+		<typeAlias type="cm.domain.Wishlist" alias="Wishlist"></typeAlias>		
+	</typeAliases>
+
+	<environments default="development">			<!-- enviroments -> 환경이 여러개 들어갈수 있음 default는 id가 development인 환경으로 설정했음 -->
+		<environment id="development">		<!-- 환경의 Default는 이 환경으로(enviroment) -->
+
+			<transactionManager type="JDBC" />
+
+			<dataSource type="POOLED">		<!-- dataSource 타입은 pooled로 할거임 -->
+				<property name="driver" value="${driver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+			</dataSource>
+
+		</environment>
+	</environments>
+
+	<mappers>
+		<mapper resource="cm/store/mapper/TimetableMapper.xml"/>
+		<mapper resource="cm/store/mapper/UserMapper.xml"/>
+		<mapper resource="cm/store/mapper/ManageLectureMapper.xml"/>
+		<mapper resource="cm/store/mapper/WishlistMapper.xml"/>
+		<mapper resource="cm/store/mapper/CommentMapper.xml"/>
+	</mappers>
+
+</configuration>
+
+<!-- dtd설정 -->

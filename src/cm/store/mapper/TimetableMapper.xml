@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="cm.store.mapper.TimetableMapper">
+  
+ 	 <resultMap type="Timetable" id="TimetableMap">
+  		
+  		<id property="id" column="Timetable_id" />
+		<id property="registYear" column="registeryear" />
+		  		
+  		<result property="name" column="Timetable_name" />
+  		<result property="semester" column="semester"/>
+  		
+  		<collection property="lectures" column="lec_id" ofType="Lecture"
+  		select="cm.store.mapper.ManageLectureMapper.searchLectureDetail" javaType="ArrayList"
+  		jdbcType="NUMERIC" />
+
+  	</resultMap>
+  	
+  	<resultMap type="Lecture" id="TimetableListMap">
+  	
+    		<id property="id" column="lecture_id"/>
+ 			<result property="etc" column="etc"/>
+ 			<result property="code" column="lecture_code"/>
+ 			<result property="name" column="lecture_name"/>
+ 			<result property="grade" column="grade"/>
+ 			<result property="school" column="school"/>
+ 			<result property="department" column="department"/>
+ 			<result property="division" column="division"/>
+ 			
+  	</resultMap>
+   
+    <!-- 강의 조회용 -->
+      
+ 	<resultMap type="Lecture" id="LectureMap">
+ 		  <constructor>
+ 			<idArg column="lecture_id" javaType="int"/>
+ 		</constructor>
+ 		  
+		 	<id property="id" column="lecture_id"/>
+ 			<result property="etc" column="etc"/>
+ 			<result property="code" column="lecture_code"/>
+ 			<result property="name" column="lecture_name"/>
+ 			<result property="grade" column="grade"/>
+ 			<result property="school" column="school"/>
+ 			<result property="department" column="department"/>
+ 			<result property="division" column="division"/>
+ 			<result property="year" column="year"/>
+ 			<result property="semester" column="semester"/>
+ 			<association property="classTime" javaType="ClassTime">
+ 				<id property="id" column="class_time_id"/>
+		 		<result property="firstDay" column="first_day"/>
+		 		<result property="firstTime" column="first_time"/>
+		 		<result property="secondDay" column="second_day"/>
+		 		<result property="secondTime" column="second_time"/>
+		 		<result property="thirdDay" column="third_day"/>
+		 		<result property="thirdTime" column="third_time"/>
+		 		<result property="fourthDay" column="fourth_day"/>
+		 		<result property="fourthTime" column="fourth_time"/>
+		 		<result property="fifthDay" column="fifth_day"/>
+		 		<result property="fifthTime" column="fifth_time"/>
+		 		<result property="sixthDay" column="sixth_day"/>
+		 		<result property="sixthTime" column="sixth_time"/>
+ 			</association>
+ 			<association property="professor" javaType="Professor">
+ 				<id property="id" column="professor_id"/>
+		 		<result property="name" column="professor_name"/>
+		 		<result property="school" column="school"/>
+		 		<result property="department" column="department"/>
+		 		<result property="email" column="email"/>
+ 			</association>
+ 			<collection property="buildings" ofType="building">
+ 				<id property="id" column="building_id"/>
+ 				<result property="name" column="building_name"/>
+		 		<result property="latitude" column="latitude"/>
+		 		<result property="roomNumber" column="room_num"/>
+		 		<result property="longitude" column="longitude"/>
+ 			</collection>
+ 	</resultMap>
+ 	
+ 	
+ 	<resultMap type="User" id="UserMap">
+ 	
+ 		  <collection property="timetableList" column="timecolumn" ofType="Timetable" javaType="ArrayList" jdbcType="VARCHAR"
+ 			select="cm.store.mapper.TimetableMapper.SearchTimetable" />  
+ 		
+ 		  <collection property="timetableList" ofType="Timetable">
+ 			<id property="id" column="timetable_id"/>
+ 			<result property="registYear" column="registerYear"/>
+ 			<result property="semester" column="semester"/>
+ 			<result property="name" column="timetable_name"/>
+ 		</collection>
+ 	</resultMap>
+	
+	 	<select id="searchTimetable" parameterType="Map" resultMap="TimetableMap">
+	 			SELECT timetable_id, registerYear, timetable_name, semester 
+	 			FROM timetable_tb 
+	 			WHERE user_id=#{userId}
+	 			AND timetable_id=TO_NUMBER(#{timeId})
+	 	</select> 
+	 	
+	 <!-- 강의 추가 -->
+	  <insert id="insertLectureTimetableOne"  parameterType="String">
+	  	INSERT INTO
+	  	openedlecture_timetable_tb(timetable_id, lecture_id)
+	  	values(#{timeId}, #{lectureId})
+	  </insert>
+	  
+	  	<!-- complete -->
+	  	<!-- 시간표 하나 조회 -->
+	  	
+	  <select id="searchLectureTimetable" parameterType="int" resultMap="TimetableListMap" >
+		SELECT
+		o.etc, o.lecture_id, o.lecture_code, l.lecture_name, l.school, l.department, l.division, l.grade
+		FROM opened_lecture_tb o,lecture_tb l,building_tb b,class_time_tb c,lecture_classroom_tb lc, professor_tb p,
+		openedlecture_timetable_tb ot, timetable_tb t
+		WHERE o.lecture_code=l.lecture_code
+		AND o.lecture_id=c.lecture_id
+		AND o.lecture_id=lc.lecture_id
+		AND lc.building_id=b.building_id
+		AND o.professor_id=p.professor_id
+		AND ot.lecture_id=o.lecture_id
+		AND ot.timetable_id=t.timetable_id
+		AND t.timetable_id=#{timeId}
+	  </select>
+	  
+	  <!-- 테이블리스트 검색 -->
+	  <select id="searchTimetableList" resultMap="TimetableMap">
+	  
+	  	SELECT timetable_name, timetable_id, registerYear, semester
+	  	FROM timetable_tb
+	  	WHERE user_id=#{userId}
+	  
+	  </select>
+	  
+	  <!--  resultMap은 select시  DB로부터 나오는 값들을 담을때 변수에 대입하는 값들을 정해두는것을 말한다  -->
+	  <!-- 강의 삭제 -->
+	  <delete id="deleteTimetable">
+	  	DELETE 
+	  	FROM timetable_tb 
+	  	WHERE timetable_id=#{timeId}
+	  </delete>
+	  <delete id="deleteLectureTimetableAll" parameterType="int">
+	  	DELETE 
+	  	FROM openedlecture_timetable_tb 
+	  	WHERE timetable_id=#{timeId}
+	  </delete>
+	  <!-- 하나삭제 -->
+	  <delete id="deleteLectureTimeTableOne">
+	  	DELETE 
+	  	FROM openedlecture_timetable_tb 
+	  	WHERE timetable_id=#{timeId} AND lecture_id = #{lectureId}
+	  </delete>
+	  
+	  <!-- 틀 삭제 
+	  <delete id="deleteTimetable" parameterType="int">
+	  	DELETE t.timetable_name,t.timetable_id,t.user_id,t.registeryear,t.semester,
+	  	ot.timetable_id, ot.lectiur_id
+	  	FROM timetable_tb t , openedlecture_timetable_tb ot
+	  	WHERE t.timetable_id=ot.timetable_id
+	  	AND t.timetalbe_id=#{id}
+	  </delete>-->
+	  <!-- 틀 생성 -->
+	  <insert id="createTimetable" parameterType="Map" >
+	  	INSERT INTO timetable_tb(timetable_name,timetable_id, user_id, registerYear, semester)
+		values(#{timetable.name},timetable_id_seq.nextval, TO_CHAR(#{userId}), #{timetable.registYear}, #{timetable.semester})
+	  </insert>
+	  	
+	  </mapper>

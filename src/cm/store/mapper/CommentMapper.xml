@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="cm.store.mapper.CommentMapper">
+  
+  <resultMap type="Comment" id="commentMap">
+ 		<id column="comment_id" property="id"/>
+ 		<result column="creation_time" property="creationTime"/>
+ 		<result column="user_id" property="userId"/>
+ 		<result column="lecture_code" property="lectureId"/>
+ 		<result column="content" property="content"/>
+ 	</resultMap>
+ 	
+ 	<sql id="selectComment">
+ 		SELECT comment_id, content, creation_time, user_id, lecture_code
+ 		FROM comment_tb
+ 	</sql>	
+ 	
+ 	
+ 	<select id="searchCommentList" parameterType="String" resultMap="commentMap">
+ 		<include refid="selectComment"></include>
+ 			WHERE lecture_code=#{lectureId}
+ 		
+ 	</select>
+ 	
+ 	<insert id="insertComment" parameterType="Comment">
+ 		<selectKey keyProperty="id" resultType="int" order="BEFORE">
+    		select comment_id_seq.nextval FROM DUAL
+  		</selectKey>
+ 		INSERT INTO comment_tb(comment_id, content, creation_time, user_id, lecture_code)
+ 		VALUES (#{id}, #{content}, sysdate, #{userId}, #{lectureId})
+ 		
+ 	</insert>
+ 	
+ 	<delete id="deleteComment" parameterType="map">
+ 		DELETE FROM comment_tb
+ 		WHERE user_id=#{userId} and comment_id=TO_NUMBER(#{id})
+ 	</delete>
+ 	
+ 	<update id="modifyComment" parameterType="Comment">
+ 		UPDATE comment_tb
+ 		SET content=#{content} WHERE comment_id=#{id}
+ 	</update>
+ 	
+ 	</mapper>

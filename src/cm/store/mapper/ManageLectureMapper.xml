@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="cm.store.mapper.ManageLectureMapper">
+    <sql id="selectList">
+ 		SELECT o.etc, o.lecture_id, o.lecture_code, o.semester,o.year,
+				l.lecture_name, l.credit, l.school, l.department, l.division, l.grade,
+				b.building_id, b.building_name, b.latitude, b.room_num, longitude,
+				c.class_time_id, c.first_day, c.first_time, c.second_day, c.second_time, c.third_day, c.third_time, c.fourth_day,c.fourth_time,
+				c.fifth_day, c.fifth_time, c.sixth_day, c.sixth_time,
+				p.professor_id, p.professor_name,p.school, p.department,p.email
+		FROM opened_lecture_tb o,lecture_tb l,
+				building_tb b,class_time_tb c,lecture_classroom_tb lc, professor_tb p
+		WHERE o.lecture_code=l.lecture_code
+				AND o.lecture_id=c.lecture_id
+				AND o.lecture_id=lc.lecture_id
+				AND lc.building_id=b.building_id
+				AND o.professor_id=p.professor_id
+ 	</sql>
+    <!-- 강의 리스트 조회 -->
+    <resultMap type="String" id="lectureListMap">
+    	<collection property="lectures" ofType="lecture">
+    		<id property="id" column="lecture_id"/>
+ 			<result property="etc" column="etc"/>
+ 			<result property="code" column="lecture_code"/>
+ 			<result property="name" column="lecture_name"/>
+ 			<result property="grade" column="grade"/>
+ 			<result property="school" column="school"/>
+ 			<result property="department" column="department"/>
+ 			<result property="division" column="division"/>
+ 			<result property="year" column="year"/>
+ 			<result property="semester" column="semester"/>
+ 			<association property="classTime" javaType="ClassTime" jdbcType="VARCHAR">
+ 				<id property="id" column="class_time_id"/>
+		 		<result property="firstDay" column="first_day"/>
+		 		<result property="firstTime" column="first_time"/>
+		 		<result property="secondDay" column="second_day"/>
+		 		<result property="secondTime" column="second_time"/>
+		 		<result property="thirdDay" column="third_day"/>
+		 		<result property="thirdTime" column="third_time"/>
+		 		<result property="fourthDay" column="fourth_day"/>
+		 		<result property="fourthTime" column="fourth_time"/>
+		 		<result property="fifthDay" column="fifth_day"/>
+		 		<result property="fifthTime" column="fifth_time"/>
+		 		<result property="sixthDay" column="sixth_day"/>
+		 		<result property="sixthTime" column="sixth_time"/>
+ 			</association>
+ 			<association property="professor" javaType="Professor">
+ 				<id property="id" column="professor_id"/>
+		 		<result property="name" column="professor_name"/>
+		 		<result property="school" column="school"/>
+		 		<result property="department" column="department"/>
+		 		<result property="email" column="email"/>
+ 			</association>
+ 			<collection property="buildings" ofType="building">
+ 				<id property="id" column="building_id"/>
+ 				<result property="name" column="building_name"/>
+		 		<result property="latitude" column="latitude"/>
+		 		<result property="roomNumber" column="room_num"/>
+		 		<result property="longitude" column="longitude"/>
+ 			</collection>
+ 		</collection>
+    </resultMap>
+    <!-- 강의 조회용 -->
+ 	<resultMap type="Lecture" id="LectureMap" >
+ 		<!--  <constructor>
+ 			<idArg column="lecture_id" javaType="int"/>
+ 		</constructor>-->
+		 	<id property="id" column="lecture_id"/>
+ 			<result property="etc" column="etc"/>
+ 			<result property="code" column="lecture_code"/>
+ 			<result property="name" column="lecture_name"/>
+ 			<result property="grade" column="grade"/>
+ 			<result property="school" column="school"/>
+ 			<result property="department" column="department"/>
+ 			<result property="division" column="division"/>
+ 			<result property="year" column="year"/>
+ 			<result property="semester" column="semester"/>
+ 			<association property="classTime" javaType="ClassTime" jdbcType="VARCHAR">
+ 				<id property="id" column="class_time_id"/>
+		 		<result property="firstDay" column="first_day"/>
+		 		<result property="firstTime" column="first_time"/>
+		 		<result property="secondDay" column="second_day"/>
+		 		<result property="secondTime" column="second_time"/>
+		 		<result property="thirdDay" column="third_day"/>
+		 		<result property="thirdTime" column="third_time"/>
+		 		<result property="fourthDay" column="fourth_day"/>
+		 		<result property="fourthTime" column="fourth_time"/>
+		 		<result property="fifthDay" column="fifth_day"/>
+		 		<result property="fifthTime" column="fifth_time"/>
+		 		<result property="sixthDay" column="sixth_day"/>
+		 		<result property="sixthTime" column="sixth_time"/>
+ 			</association>
+ 			<association property="professor" javaType="Professor" jdbcType="VARCHAR">
+ 				<id property="id" column="professor_id"/>
+		 		<result property="name" column="professor_name"/>
+		 		<result property="school" column="school"/>
+		 		<result property="department" column="department"/>
+		 		<result property="email" column="email"/>
+ 			</association>
+ 			<collection property="buildings" ofType="Building" jdbcType="VARCHAR" javaType="ArrayList">
+ 				<id property="id" column="building_id"/>
+ 				<result property="name" column="building_name"/>
+		 		<result property="latitude" column="latitude"/>
+		 		<result property="roomNumber" column="room_num"/>
+		 		<result property="longitude" column="longitude"/>
+ 			</collection>
+ 	</resultMap>
+ 	<!-- ClassTime 조회용 -->
+ 	<resultMap type="ClassTime" id="classTimeMap">
+ 		<id property="id" column="class_time_id"/>
+ 		<result property="firstDay" column="first_day"/>
+ 		<result property="firstTime" column="first_time"/>
+ 		<result property="secondDay" column="second_day"/>
+ 		<result property="secondTime" column="second_time"/>
+ 		<result property="thirdDay" column="third_day"/>
+ 		<result property="thirdTime" column="third_time"/>
+ 		<result property="fourthDay" column="fourth_day"/>
+ 		<result property="fourthTime" column="fourth_time"/>
+ 		<result property="fifthDay" column="fifth_day"/>
+ 		<result property="fifthTime" column="fifth_time"/>
+ 		<result property="sixthDay" column="sixth_day"/>
+ 		<result property="sixthTime" column="sixth_time"/>
+ 	</resultMap>
+ 	<!-- 교수조회용 -->
+ 	<resultMap type="Professor" id="professorMap" >
+ 		<id property="id" column="professor_id"/>
+ 		<result property="name" column="professor_name"/>
+ 		<result property="school" column="school"/>
+ 		<result property="department" column="department"/>
+ 		<result property="email" column="email"/>
+ 	</resultMap>
+ 	<!-- 강의장 조회용 -->
+ 	<resultMap type="Building" id="buildingMap">
+ 		<id property="id" column="building_id"/>
+ 		<result property="name" column="building_name"/>
+ 		<result property="latitude" column="latitude"/>
+ 		<result property="roomNumber" column="room_num"/>
+ 		<result property="longitude" column="longitude"/>
+ 	</resultMap>
+ 	<!-- 강의를 등록하기 위해 강의코드로 강의 찾아와야함. -->
+ 	<select id="searchLectureByName" resultType="String">
+ 		SELECT lecture_code, lecture_name,credit,school, department, division, grade
+ 		FROM lecture_tb
+ 		WHERE lecture_name LIKE '%'||#{name}||'%'
+ 	</select>
+ 	
+ 	<select id="searchLecture" resultType="Lecture">
+ 		SELECT lecture_code, lecture_name,credit,school, department, division, grade
+ 		FROM lecture_tb
+ 		WHERE lecture_code = #{code}
+ 	</select>
+ 	<!-- 강의등록 / 미정리 -->
+	<insert id="insertLecture" useGeneratedKeys="true">
+		
+	</insert>
+	<update id="modifyLecture">
+	</update>
+	<delete id="deleteLecture">
+	</delete>
+	<select id="searchSchoolAll" resultType="String">
+        SELECT distinct school
+	 	FROM lecture_tb
+	</select>
+ 	<!--  <select id="searchSchoolAll" resultType="String">
+	 		
+		</select>    
+	-->
+	<!-- 학교별 이수조건 조회 -->
+	<select id="searchDivisionBySchool" resultType="String">
+			SELECT distinct division
+	 		FROM lecture_tb
+			WHERE school = #{school}
+	</select>
+	<!-- 강의별 수업시간 조회 -->
+ 	<select id="searchClassTimeBylectureId" resultMap="classTimeMap">
+ 		SELECT class_time_id, lecture_id, first_day, first_time, second_day, second_time,
+ 		 third_day, third_time, fourth_day, fourth_time, fifth_day, fifth_time, sixth_day, sixth_time
+ 		FROM class_time_tb
+ 		WHERE lecture_id = #{id}
+ 	</select>
+ 	<!-- 교수 조회 -->
+ 	<select id="searchProfessor" resultMap="professorMap">
+ 		SELECT professor_id,professor_name, school, department, email
+ 		FROM professor_tb
+ 		WHERE professor_id = #{id}
+ 	</select>
+ 	
+ 	<!-- 강의장 리스트 조회 -->
+ 	<select id="searchBuildings" resultMap="buildingMap">
+ 		SELECT distinct building_name
+ 		FROM building_tb
+ 	</select>
+ 	<!-- 학교이름으로 학과리스트 찾기 -->
+ 	<select id="searchDepartmentBySchool" resultType="String">
+		SELECT distinct department
+ 		FROM lecture_tb
+		WHERE school = #{school}
+	</select>
+ 	<!-- 강의장 조회 -->
+	<select id="searchBuilding" resultType="Building" resultMap="buildingMap">
+ 		SELECT b.building_id,b.building_name,b.latitude, b.room_num, b.longitude
+ 		FROM lecture_classroom_tb l, building_tb b
+ 		WHERE b.building_id=l.building_id AND l.lecture_id = #{id}
+ 	</select>
+	<!-- 강의리스트 조회 -->
+	<select id="searchLecturelist" resultMap="LectureMap">
+		<include refid="selectList"/>
+				AND l.school = #{school}
+				AND l.department = #{department}
+				AND l.division = #{division}
+				AND o.year = TO_NUMBER(#{year})
+				AND o.semester = #{semester}
+				AND l.lecture_name LIKE '%'||#{name}||'%'
+	</select>
+	<!-- 강의리스트 조회 이름제외-->
+	<select id="searchLecturelistWithoutName" resultMap="LectureMap">
+		<include refid="selectList"/>
+				AND l.school = #{school}
+				AND l.department = #{department}
+				AND l.division = #{division}
+				AND o.year = TO_NUMBER(#{year})
+				AND o.semester = #{semester}
+	</select>
+	<!-- 강의 조회 -->
+	<select id="searchLectureDetail" resultMap="LectureMap">
+		<include refid="selectList"/>
+				AND o.lecture_id=#{id}
+	</select>
+	<select id="searchLectureByprofessorId" resultMap="LectureMap">
+		<include refid="selectList"/>
+				AND p.professor_id=#{id}
+	</select>
+ 	<select id="searchProfessorByName" resultMap="professorMap">
+ 		SELECT professor_id,professor_name, school, department, email
+ 		FROM professor_tb
+ 		WHERE professor_name = #{name}
+ 	</select>
+ 	
+	
+	
+ </mapper>   
+    

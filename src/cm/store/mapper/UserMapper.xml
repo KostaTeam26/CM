@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="cm.store.mapper.UserMapper">
+
+	<resultMap type="User" id="userMap">
+		<id column="user_id" property="id"/>
+		<result column="nickname" property="nickName"/>
+		<result column="password" property="password"/>
+		<result column="school" property="school"/>
+		<result column="department" property="department"/>
+		<result column="admission_year" property="admissionYear"/>
+		<result column="grade" property="grade"/>		
+		<result column="semester" property="semester"/>
+		<association column="requirement_id" property="requirement"			
+			  select="specialSearchRequirement" javaType="Requirement" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<resultMap type="Requirement" id="requirementMap">		
+		<id column="requirement_id" property="id"/>
+		<result column="total_credit" property="totalCredit"/>
+		<result column="school" property="school"/>
+		<result column="department" property="department"/>
+		<result column="admission_year" property="admissionYear"/>
+		<result column="major_essential" property="majorEssential"/>
+		<result column="major_selection" property="majorSelection"/>
+		<result column="liberal_essential" property="liberalEssential"/>
+		<result column="liberal_selection" property="liberalSelection"/>		
+</resultMap>
+	
+	<sql id="selectUser">
+	SELECT user_id,nickname,password,school,department,admission_year,grade,semester,requirement_id
+	FROM user_tb	
+	</sql>
+	
+	<sql id="selectRequirement">
+	SELECT requirement_id,total_credit,school,department,admission_year,major_essential,major_selection,liberal_essential,liberal_selection
+	FROM requirement_tb
+	</sql>
+	
+	<select id="searchUser" parameterType="string" resultMap="userMap">
+		<include refid="selectUser"></include>
+		WHERE user_id=#{id}	
+	</select>
+	
+	<select id="searchUserAll" resultMap="userMap">
+		<include refid="selectUser"></include>
+		ORDER BY user_id DESC	
+	</select>
+	
+	<select id="specialSearchRequirement" parameterType="Integer" resultMap="requirementMap">
+		<include refid="selectRequirement"></include>
+		WHERE requirement_id=#{id}
+	</select>
+	
+	<select id="searchRequirement" parameterType="User" resultMap="requirementMap">
+		SELECT requirement_id,total_credit,school,department,admission_year,major_essential,major_selection,liberal_essential,liberal_selection
+		FROM requirement_tb
+		WHERE requirement_id=(select requirement_id from user_tb where user_id=#{id})
+	</select>
+	
+	<insert id="insertUser">
+		INSERT INTO user_tb(user_id,nickname,password,school,department,admission_year,grade,semester,requirement_id)
+		VALUES(#{id},#{nickName},#{password},#{school},#{department},#{admissionYear},#{grade},#{semester},#{requirement.id})	
+	</insert>
+	
+	<update id="modifyUser">	
+		UPDATE user_tb
+		SET nickname=#{nickName},password=#{password},school=#{school},department=#{department},grade=#{grade},semester=#{semester},admission_year=#{admissionYear}
+		WHERE user_id=#{id}
+	</update>
+	
+	<delete id="deleteUser">
+		DELETE user_tb
+		WHERE user_id=#{userId}
+	</delete>
+	
+	
+	
+	
+	
+</mapper>
+	
+	

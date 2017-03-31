@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+    <mapper namespace="cm.store.mapper.WishlistMapper">
+    <sql id="selectList">
+ 		SELECT o.etc, o.lecture_id, o.lecture_code, o.semester,o.year,
+				l.lecture_name, l.credit, l.school, l.department, l.division, l.grade,
+				b.building_id, b.building_name, b.latitude, b.room_num, longitude,
+				c.class_time_id, c.first_day, c.first_time, c.second_day, c.second_time, c.third_day, c.third_time, c.fourth_day,c.fourth_time,
+				c.fifth_day, c.fifth_time, c.sixth_day, c.sixth_time,
+				p.professor_id, p.professor_name,p.school, p.department,p.email
+		FROM opened_lecture_tb o,lecture_tb l,
+				building_tb b,class_time_tb c,lecture_classroom_tb lc, professor_tb p
+		WHERE o.lecture_code=l.lecture_code
+				AND o.lecture_id=c.lecture_id
+				AND o.lecture_id=lc.lecture_id
+				AND lc.building_id=b.building_id
+				AND o.professor_id=p.professor_id
+ 	</sql>
+    <resultMap id="wishlistMap" type="Wishlist">
+   		<id property="id" column="user_id" />	
+		<collection property="lectures" javaType="ArrayList" column="lecture_id" ofType="Lecture">
+			<id property="id" column="lecture_id"/>
+              <result property="etc" column="etc"/>
+              <result property="name" column="lecture_name"/>
+              <result property="code" column="lecture_code"/>
+              <result property="grade" column="grade"/>
+              <result property="school" column="school"/>
+              <result property="department" column="department"/>
+              <result property="division" column="division"/>
+              <result property="year" column="year"/>
+              <result property="semester" column="semester"/>
+			  <result property="credit" column="credit"/>
+        <association property="classTime" javaType="ClassTime">
+                  <id property="id" column="class_time_id"/>
+                  <result property="firstDay" column="first_day"/>
+                  <result property="firstTime" column="first_time"/>
+                  <result property="secondDay" column="second_day"/>
+                  <result property="secondTime" column="second_time"/>
+                  <result property="thirdDay" column="third_day"/>
+                  <result property="thirdTime" column="third_time"/>
+                  <result property="fourthDay" column="fourth_day"/>
+                  <result property="fourthTime" column="fourth_time"/>
+                  <result property="fifthDay" column="fifth_day"/>
+                  <result property="fifthTime" column="fifth_time"/>
+                  <result property="sixthDay" column="sixth_day"/>
+                  <result property="sixthTime" column="sixth_time"/>
+        </association>
+        <association property="professor" javaType="Professor">
+                  <id property="id" column="professor_id"/>
+                  <result property="name" column="professor_name"/>
+                  <result property="school" column="school"/>
+                  <result property="department" column="department"/>
+                  <result property="email" column="email"/>
+       </association>
+       <collection property="buildings" ofType="Building">
+                  <id property="id" column="building_id"/>
+                  <result property="name" column="building_name"/>
+                  <result property="latitude" column="latitude"/>
+                  <result property="roomNumber" column="room_num"/>
+                  <result property="longitude" column="longitude"/>
+        </collection>
+	</collection>
+    </resultMap> 
+	
+
+    <select id="searchLectureAllWishlist" parameterType="String" resultMap="wishlistMap">
+    SELECT l.lecture_name, l.lecture_code, l.credit, l.division, ol.lecture_id
+ 	FROM lecture_tb l, wishlist_tb w, user_tb u,opened_lecture_tb ol
+	WHERE w.lecture_id = ol.lecture_id
+	AND ol.lecture_code = l.lecture_code
+	AND w.user_id = u.user_id
+	AND u.user_id = #{userId}
+    </select>
+    
+    <insert id="insertLectureWishlist" parameterType="wishlist"> 
+    INSERT INTO wishlist_tb(lecture_id, user_id)
+   	VALUES(#{lectureId}, #{userId})
+  	</insert>
+  
+    <delete id="deleteLectureWishlist" parameterType="wishlist">
+    DELETE FROM wishlist_tb
+	WHERE user_id = #{userId}
+	AND lecture_id = #{lectureId}
+
+	</delete>
+    
+    <delete id="deleteLectureAllWishlist">
+    	DELETE FROM wishlist_tb
+		WHERE user_id = #{userId}
+    </delete>
+    
+    
+</mapper>
